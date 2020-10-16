@@ -1,0 +1,77 @@
+{
+  "builders": [
+    {
+      "boot_command": [
+        "S<enter>",
+        "cat <<EOF >>install.conf<enter>",
+        "System hostname = openbsd67<enter>",
+        "Password for root = vagrant<enter>",
+        "Setup a user = vagrant<enter>",
+        "Password for user = vagrant<enter>",
+        "Allow root ssh login = yes<enter>",
+        "What timezone are you in = UTC<enter>",
+        "Location of sets = cd<enter>",
+        "Set name(s) = -game*.tgz -x*.tgz<enter>",
+        "Directory does not contain SHA256.sig. Continue without verification = yes<enter>",
+        "EOF<enter>",
+        "install -af install.conf \u0026\u0026 reboot<enter>"
+      ],
+      "boot_wait": "30s",
+      "disk_size": "{{user `disk`}}",
+      "guest_additions_mode": "disable",
+      "guest_os_type": "OpenBSD_64",
+      "http_directory": "http",
+      "http_port_max": "8954",
+      "http_port_min": "8954",
+      "iso_checksum": "file:https://cdn.openbsd.org/pub/OpenBSD/6.7/amd64/SHA256",
+      "iso_url": "https://cdn.openbsd.org/pub/OpenBSD/6.7/amd64/install67.iso",
+      "shutdown_command": "/sbin/halt -p",
+      "ssh_password": "{{user `ssh_pass`}}",
+      "ssh_timeout": "10000s",
+      "ssh_username": "{{user `ssh_user`}}",
+      "type": "virtualbox-iso",
+      "vboxmanage": [
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--memory",
+          "{{user `mem`}}"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--cpus",
+          "{{user `cpus`}}"
+        ]
+      ],
+      "vm_name": "{{user `vm_name`}}"
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "vagrant"
+    }
+  ],
+  "provisioners": [
+    {
+      "scripts": [
+        "scripts/bootstrap.sh"
+      ],
+      "type": "shell"
+    },
+    {
+      "destination": "/etc/rc.firsttime",
+      "source": "http/rc.firsttime",
+      "type": "file"
+    }
+  ],
+  "variables": {
+    "cpus": "1",
+    "disk": "8192",
+    "mem": "1024",
+    "ssh_pass": "vagrant",
+    "ssh_user": "root",
+    "vm_name": "openbsd67"
+  }
+}
+
